@@ -1,0 +1,57 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET     /                        controllers.Application.index
+GET     /stock/:id               controllers.Application.getStock(id:String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file            controllers.Assets.at(path="/public", file)
+
+
+
+
+
+#GET	/edit					controllers.BuildNotes.edit
+
+
+#GET	/findAddedBuilds		controllers.BuildNotes.findAddedBuilds()
+GET		/bn						controllers.BuildNotes.buildnote()
+
+
+#GET - select
+GET		/builds					controllers.BuildNotes.getAllBuilds()
+GET		/builds/:year			controllers.BuildNotes.getBuildsInYear(year: Int)
+GET		/build/:id				controllers.BuildNotes.getBuildById(id: String)
+
+#POST - create
+POST	/build/:id				controllers.BuildNotes.addBuild(id: String)
+
+#PUT - update
+PUT		/build/:id				controllers.BuildNotes.updateBuild(id: String)
+
+#DELETE - delete
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+GET		/login										controllers.BuildNotes.login()
+GET		/list/:user/:pass/:repo						controllers.BuildNotes.list(user: String, pass: String, repo: String)
+
+GET		/findAddedBuilds/:user/:pass/:repo			controllers.BuildNotes.findAddedBuilds(user: String, pass: String, repo: String)
+
+
+GET		/edit/:label								controllers.BuildNotes.edit(label: String)
+
+POST	/save										controllers.BuildNotes.saveChanges()

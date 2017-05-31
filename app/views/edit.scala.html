@@ -1,0 +1,147 @@
+@(label: String)
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script src= "http://ajax.googleapis.com/ajax/libs/angularjs/1.2.26/angular.min.js"></script>
+
+
+<style>
+	input {
+		/*text-transform: uppercase;*/
+	}
+	
+	.tx-title {
+		color: green;
+		width: 600px;
+	}
+</style>
+
+</head>
+
+<body>
+
+<div ng-app="" ng-controller="customersController"> 
+
+<!-- new template -->
+<div class="build-label" ng-repeat="build in builds">
+	<!--<p><b class="label-build">build {{build.label}}</b> [{{build.builddate}}] - <i class="label-ua" ng-show="build.uadate"> [UA - <input type="text" ng-model="build.uadate">]</i><i class="label-prod">[Production - <input type="text" ng-model="build.proddate">]</i></p>-->
+	<p><b class="label-build">build <input type="text" ng-model="build.label"></b> [{{build.builddate}}] - <i class="label-ua"> [UA - <input type="text" ng-model="build.uadate">]</i><i class="label-prod">[Production - <input type="text" ng-model="build.proddate">]</i></p>
+<h5 class="sub-section-head">label notes</h5>
+<ul>
+	<li ng-repeat="defect in build.defects | orderBy:'id'" ng-show="([defect] | filter:{ status: '!GO'}).length > 0">
+		<!--a href=http://dserver/defect/{{defect.id}}.html>{{defect.id}}</a--><input type="text" ng-model="defect.id"> - <input type="text" ng-model="defect.status"></span> - <input type="text" ng-model="defect.owner"> - <input class="tx-title" type="text" ng-model="defect.title">
+		<span ng-click="removeDefect(build.defects, defect)">Remove</span>
+	</li> 
+	<li ng-show="(build.defects | filter:{ status: '!GO'}).length < 1">None</li>
+</ul>
+<div ng-model="newitem">
+	<input type="text" ng-model="newitem.id">
+	<input type="text" ng-model="newitem.status">
+	<input type="text" ng-model="newitem.owner">
+	<input type="text" ng-model="newitem.title">
+</div>
+<button ng-click="addDefect(build.defects, newitem)">Add Defect</button>
+
+<h5 class="sub-section-head">bug fixes</h5>
+<ul>
+	<li ng-repeat="defect in build.defects | orderBy:'id'" ng-show="([defect] | filter:{ status: 'GO'}).length > 0">
+		<a href=http://dserver/defect/{{defect.id}}.html>{{defect.id}}</a> - <input type="text" ng-model="defect.status">{{defect.owner}} - <input type="text" ng-model="defect.title">
+	</li> 
+	<li ng-show="(build.defects | filter:{ status: 'GO'}).length < 1">None</li>
+</ul>
+<h5 class="sub-section-head">Patch file names</h5>
+<ul>
+	<li ng-repeat="file in build.files">{{file.path}}#{{file.rev}}</li> 
+</ul>
+<hr>
+</div>
+
+<button ng-click="save()">Save Changes</button>
+
+
+<!-- old template -->
+<!--
+<font face="arial" size="-1"  ng-repeat="build in builds">
+<p><b>build {{build.label}}</b>&nbsp;[{{build.builddate}}] - <i>[Production - NA]</i></p>
+<h5>label notes</h5>
+<ul>
+	<li ng-repeat="defect in build.defects">
+		<a href=http://dserver/defect/{{defect.id}}.html>id</a> - {{defect.status}} - {{defect.owner}} - {{defect.title}}
+	</li> 
+</ul>
+<h5>bug fixes</h5>
+<ul>
+	<li ng-repeat="defect in build.defects">
+		<a href=http://dserver/defect/{{defect.id}}.html>id</a> - {{defect.status}} - {{defect.owner}} - {{defect.title}}
+	</li> 
+</ul>
+<h5>Patch file names</h5>
+<ul>
+	<li ng-repeat="file in build.files">{{file.path}}#{{file.rev}}</li> 
+</ul>
+</font>
+<hr>
+-->
+
+
+
+
+
+
+
+</div>
+
+<script>
+function customersController($scope,$http) {
+  $http.get("/build/@label").success(
+	function(response) {
+		$scope.builds = response.builds;
+		//$scope.Statuses  = [ {"GO"}, {"SAFE"}];
+		/*
+		$scope.Statuses = [
+			{
+				'id': 		'NO RESPONSE',
+				'text': 	'NO RESPONSE',
+				'value': 	'NO RESPONSE'
+			},{
+				'id': 		1,
+				'text': 	'SAFE',
+				'value':	'SAFE'
+			},{
+				'id': 		2,
+				'text': 	'SHOWSTOPPER',
+				'value':	'SHOWSTOPPER'
+			},{
+				'id': 		3,
+				'text': 	'GO',
+				'value':	'GO'
+			}];*/
+		
+		$scope.save = function () {
+			var data = JSON.stringify($scope.builds);
+			
+			data = "{ \"builds\" : " + data + "}";
+			
+			localStorage.setItem('buildnote', data);
+			
+			$http.post("/save", data, null).success(function() { alert('saved!'); });
+		}
+		
+		$scope.addDefect = function (defects, newitem) {
+			console.log(defects);
+			console.log(newitem);
+			defects.push(angular.copy(newitem));
+			console.log(defects);
+		}
+		
+		$scope.removeDefect = function(defects, defect) {
+			defects.pop(defect);
+		}
+	});
+}
+</script>
+
+</body>
+</html>
